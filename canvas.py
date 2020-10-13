@@ -4,13 +4,13 @@ import numpy as np
 import math
 
 
-plt.axis([-50,50,-50,50])
+plt.axis([-20,20,-20,20])
 
 
 ax = plt.gca()
 
-X = np.random.randint(-50,50,20).tolist()
-Y = np.random.randint(-50,50,20).tolist()
+X = np.random.randint(-20,20,20).tolist()
+Y = np.random.randint(-20,20,20).tolist()
 
 for i in range(20):
     
