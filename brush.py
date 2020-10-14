@@ -27,16 +27,21 @@ class BrushPoint:
 
 
 class CBrush:
-    def __init__(self,length=3,width=1,time_lag=1):
+    def __init__(self,drawer,length=3,width=1,time_lag=1):
+
+        self.drawer = drawer
+
         '''
         length is the length of the brush tip
         width is the width of the root of brush tip
         time_lag is the time lag of the tip angle follows the opposite direction of the brush move.
+        bp_num is the brush point number in the brush tip
         '''
         
         self.length = length
         self.width = width
         self.time_lag = time_lag
+        self.bp_num = 50
 
         '''
         x,y is the coordination of the brush 
@@ -49,18 +54,29 @@ class CBrush:
 
 
         '''
-        a mat to store the last 10 BrushPoint status
+        a list to store this time's and last time's BrushPoint status
         '''
 
         self.num_brush_point = 50
+        self.this_state = []
         self.last_state = []
+        self.bp_list = []
+        dh = self.length / self.bp_num
+        dd = self.width / self.bp_num
+        for i in range(self.bp_num):
+            tmp_bp = BrushPoint(self.drawer,i*dh,i*dd,self.length)
+            self.bp_list.append(tmp_bp)
+        
+        
 
     def set_pos(self,x,y):
         self.x = x
         self.y = y
 
 
-
+    def draw(self):
+        for bp in self.this_state:
+            bp.draw()
 
 if __name__ == "__main__":
     
