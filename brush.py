@@ -4,24 +4,28 @@ import numpy as np
 import math
 
 class BrushPoint:
-    def __init__(self,drawer,z,d,h):
+    def __init__(self,drawer,t,x,y,z,d,h):
         '''
         drawer is the handle of drawing
+        t is the time of the brush point
         z is the height of the brush point over the paper
         d is the diameter of the point area
-        h is the length of the brush tip
+        h is the brush length
         '''
         self.drawer = drawer
         self.z = z
         self.d = d
+        self.x = x
+        self.y = y
+        self.t = t
         self.h = h
     
-    def draw(self,x,y,theta):
+    def draw(self,):
         tmp_l = self.h - self.z
         if tmp_l > 0:
             pass
         else:
-            self.drawer.scatter(x+tmp_l*math.cos(theta), y+tmp_l*math.sin(theta), s=self.d, c='k', marker='.')
+            self.drawer.scatter(self.x, self.y, s=self.d, c='k', marker='.')
 
 
 
@@ -31,11 +35,13 @@ class CBrush:
 
         self.drawer = drawer
 
+        self.t = 0
+
         '''
         length is the length of the brush tip
         width is the width of the root of brush tip
-        time_lag is the time lag of the tip angle follows the opposite direction of the brush move.
-        bp_num is the brush point number in the brush tip
+        time_lag is the time lag of each bruch point during the brush move.
+        bp_num is the brush point number in the brush tip, which equals to the state preserve stack.
         '''
         
         self.length = length
@@ -50,22 +56,20 @@ class CBrush:
 
         self.x = 0
         self.y = 0
-        self.h = self.length
+        self.z = self.length
 
 
         '''
-        a list to store this time's and last time's BrushPoint status
+        a list to store state preserve BrushPoint status
         '''
 
         self.num_brush_point = 50
-        self.this_state = []
-        self.last_state = []
-        self.bp_list = []
+        self.bp_state_list = []
         dh = self.length / self.bp_num
         dd = self.width / self.bp_num
         for i in range(self.bp_num):
-            tmp_bp = BrushPoint(self.drawer,i*dh,i*dd,self.length)
-            self.bp_list.append(tmp_bp)
+            tmp_bp = BrushPoint(self.drawer,self.t,self.x,self.y,i*dh,i*dd,self.length)
+            self.bp_state_list.append(tmp_bp)
         
         
 
