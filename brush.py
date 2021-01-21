@@ -4,10 +4,9 @@ import numpy as np
 import math
 
 class BrushPoint:
-    def __init__(self,drawer,t,x,y,z,d,h):
+    def __init__(self,drawer,x,y,z,d,h):
         '''
         drawer is the handle of drawing
-        t is the time of the brush point
         z is the height of the brush point over the paper
         d is the diameter of the point area
         h is the brush length
@@ -17,21 +16,19 @@ class BrushPoint:
         self.d = d
         self.x = x
         self.y = y
-        self.t = t
         self.h = h
     
-    def draw(self,):
-        tmp_l = self.h - self.z
-        if tmp_l > 0:
+    def draw(self):
+        if self.z > 0:
             pass
         else:
-            self.drawer.scatter(self.x, self.y, s=self.d, c='k', marker='.')
+            self.drawer.scatter(self.x, self.y, s=self.d**2 / 4, c='k', marker='.')
 
 
 
 
 class CBrush:
-    def __init__(self,drawer,length=3,width=1,time_lag=1):
+    def __init__(self,drawer,length=3,width=50,delta_t=0.01):
 
         self.drawer = drawer
 
@@ -46,8 +43,8 @@ class CBrush:
         
         self.length = length
         self.width = width
-        self.time_lag = time_lag
-        self.bp_num = 50
+        self.delta_t = delta_t
+        self.bp_num = 10
 
         '''
         x,y is the coordination of the brush 
@@ -63,26 +60,58 @@ class CBrush:
         a list to store state preserve BrushPoint status
         '''
 
-        self.num_brush_point = 50
         self.bp_state_list = []
         dh = self.length / self.bp_num
         dd = self.width / self.bp_num
         for i in range(self.bp_num):
-            tmp_bp = BrushPoint(self.drawer,self.t,self.x,self.y,i*dh,i*dd,self.length)
+            tmp_bp = BrushPoint(self.drawer,self.x,self.y,i*dh,i*dd,self.length)
             self.bp_state_list.append(tmp_bp)
+        self.bp_state_list = self.bp_state_list[::-1]
         
-        
+    def update_bp(self,dz):
+        for i in range(1,self.bp_num):
+            self.bp_state_list[i].x = self.bp_state_list[i-1].x
+            self.bp_state_list[i].y = self.bp_state_list[i-1].y
+            self.bp_state_list[i].z += dz
+        self.bp_state_list[0].x = self.x
+        self.bp_state_list[0].y = self.y
+        self.bp_state_list[0].z = self.z
 
-    def set_pos(self,x,y):
+
+    def move(self,dx,dy,dz,dt):
+        times = int(dt / self.delta_t) + 1
+        tx = dx / times
+        ty = dy / times
+        tz = dz / times
+        for i in range(times):
+            self.set_pos(self.x + tx, self.y + ty, self.z + tz)
+            self.update_bp(tz)
+            self.draw()
+        for i in range(self.bp_num):
+            self.update_bp(tz)
+            self.draw()
+        self.t += dt
+
+    def set_pos(self,x,y,z):
         self.x = x
         self.y = y
+        self.z = z
 
 
     def draw(self):
-        for bp in self.this_state:
+        for bp in self.bp_state_list:
             bp.draw()
+
+    def show_bp_list(self):
+        for bp in self.bp_state_list:
+            print('z: ',bp.z,'w: ',bp.d)
 
 if __name__ == "__main__":
     
     plt.axis([-20,20,-20,20])
     ax = plt.gca()
+    bs = CBrush(ax)
+    bs.move(10,10,-2,1)
+    bs.show_bp_list()
+    plt.show()
+
