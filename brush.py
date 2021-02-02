@@ -68,8 +68,20 @@ class CBrush:
             self.bp_state_list.append(tmp_bp)
         self.bp_state_list = self.bp_state_list[::-1]
         
+    def get_avg(self,bp_l,axis):
+        res = 0
+        if axis == 0:
+            for i in bp_l:
+                res += i.x
+        else:
+            for i in bp_l:
+                res += i.y
+        return res/len(bp_l)
+    
     def update_bp(self,dz):
         for i in range(1,self.bp_num):
+            # self.bp_state_list[i].x = self.get_avg(self.bp_state_list[:i],0)
+            # self.bp_state_list[i].y = self.get_avg(self.bp_state_list[:i],1)
             self.bp_state_list[i].x = self.bp_state_list[i-1].x
             self.bp_state_list[i].y = self.bp_state_list[i-1].y
             self.bp_state_list[i].z += dz
@@ -88,6 +100,17 @@ class CBrush:
             self.update_bp(tz)
             self.draw()
         for i in range(self.bp_num):
+            self.update_bp(tz)
+            self.draw()
+        self.t += dt
+
+    def drop(self,dx,dy,dz,dt):
+        times = int(dt / self.delta_t) + 1
+        tx = dx / times
+        ty = dy / times
+        tz = dz / times
+        for i in range(times):
+            self.set_pos(self.x + tx, self.y + ty, self.z + tz)
             self.update_bp(tz)
             self.draw()
         self.t += dt
@@ -111,7 +134,8 @@ if __name__ == "__main__":
     plt.axis([-20,20,-20,20])
     ax = plt.gca()
     bs = CBrush(ax)
-    bs.move(10,10,-2,1)
+    bs.drop(2,-2,-2,0.5)
+    bs.move(10,10,0.5,1)
     bs.show_bp_list()
     plt.show()
 
