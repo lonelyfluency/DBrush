@@ -28,7 +28,7 @@ class BrushPoint:
 
 
 class CBrush:
-    def __init__(self,drawer,length=3,width=50,delta_t=0.01):
+    def __init__(self,drawer,length=3,width=80,delta_t=0.01):
 
         self.drawer = drawer
 
@@ -78,7 +78,7 @@ class CBrush:
                 res += i.y
         return res/len(bp_l)
     
-    def update_bp(self,dz):
+    def update_bp(self,dx,dy,dz):
         for i in range(1,self.bp_num):
             # self.bp_state_list[i].x = self.get_avg(self.bp_state_list[:i],0)
             # self.bp_state_list[i].y = self.get_avg(self.bp_state_list[:i],1)
@@ -88,6 +88,9 @@ class CBrush:
         self.bp_state_list[0].x = self.x
         self.bp_state_list[0].y = self.y
         self.bp_state_list[0].z = self.z
+        for i in range(1,self.bp_num):
+            self.bp_state_list[i].x += dx
+            self.bp_state_list[i].y += dy
 
 
     def move(self,dx,dy,dz,dt):
@@ -97,11 +100,11 @@ class CBrush:
         tz = dz / times
         for i in range(times):
             self.set_pos(self.x + tx, self.y + ty, self.z + tz)
-            self.update_bp(tz)
+            self.update_bp(tx,ty,tz)
             self.draw()
-        for i in range(self.bp_num):
-            self.update_bp(tz)
-            self.draw()
+        # for i in range(self.bp_num):
+        #     self.update_bp(0,0,tz)
+        #     self.draw()
         self.t += dt
 
     def drop(self,dx,dy,dz,dt):
@@ -111,7 +114,7 @@ class CBrush:
         tz = dz / times
         for i in range(times):
             self.set_pos(self.x + tx, self.y + ty, self.z + tz)
-            self.update_bp(tz)
+            self.update_bp(tx,ty,tz)
             self.draw()
         self.t += dt
 
